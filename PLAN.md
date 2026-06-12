@@ -6,20 +6,19 @@ Standalone web app that reads existing Obsidian markdown checklist files and dis
 ## Source Files (READ-ONLY except checkbox toggling)
 Vault: `/path/to/your/Obsidian/Vault/`
 
-4 task files:
-1. `Business/Tasks Work.md` — ~25 tasks (VS business)
-2. `Private/Tasks Private.md` — ~8 tasks (personal)
-3. `Property/Task List Renovation.md` — ~9 tasks (property renovation)
-4. `Business/Tasks Side Project.md` — 1 task
+Example task files (one Markdown file per board):
+1. `Business/Tasks Work.md` — work tasks
+2. `Private/Tasks Private.md` — personal tasks
+3. `Property/Task List Renovation.md` — property renovation tasks
 
-### Real Task Format Examples
+### Task Format Examples (format observed in real files)
 ```markdown
-- [ ] Legal case - regulator inquiry - track 
+- [ ] Prepare quarterly report - track 
 - [ ] Marketing plan with the team - till 1st June. How to measure
 - [ ] https://example.gov/ 🔺 - delayed because of paperwork 
-- [ ] Docs Page for Admins - template and what to put on it ⏫ 
-- [x] Car color - ordered ➕ 2025-10-15
-- [ ] Led-подсветка 25 1 см глубина 1 см ширина 
+- [ ] Docs page for admins - template and what to put on it ⏫ 
+- [x] Order placed ➕ 2025-10-15
+- [ ] Garden bench 25 1 cm depth 1 cm wide 
 	- sub-items with indentation
 - [ ] Замена автоматизации полива - https://www.example.com/...
 ```
@@ -32,7 +31,7 @@ Key observations:
 - Mixed languages (EN/RU)
 - Free-form text with dates (`till 1st June`)
 - Non-task content mixed in (headings, paragraphs, images)
-- Files may have duplicate frontmatter blocks (Cervantes file has two)
+- Files may have duplicate frontmatter blocks (one source file has two)
 
 ## Tech Stack
 - **Backend**: Node.js + Hono + TypeScript
@@ -92,8 +91,8 @@ obsidian-kanban-app/
   "vaultRoot": "/path/to/your/Obsidian/Vault",
   "boards": [
     {
-      "id": "vs",
-      "name": "VirtoSoftware",
+      "id": "work",
+      "name": "Work",
       "file": "Business/Tasks Work.md",
       "columns": ["Backlog", "In Progress", "Blocked", "Done"]
     },
@@ -104,16 +103,10 @@ obsidian-kanban-app/
       "columns": ["Backlog", "In Progress", "Blocked", "Done"]
     },
     {
-      "id": "cervantes",
-      "name": "Cervantes 50",
+      "id": "renovation",
+      "name": "Renovation",
       "file": "Property/Task List Renovation.md",
       "columns": ["Backlog", "In Progress", "Blocked", "Done"]
-    },
-    {
-      "id": "vp",
-      "name": "VP",
-      "file": "Business/Tasks Side Project.md",
-      "columns": ["Backlog", "In Progress", "Done"]
     }
   ],
   "defaultColumns": ["Backlog", "In Progress", "Blocked", "Done"]

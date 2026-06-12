@@ -11,10 +11,10 @@ import {
   stripKbIdFromTitle,
 } from '../src/parser.js';
 
-// ─── Real content from VirtoSoftware file ─────────────────────
-const VS_CONTENT = `---
+// ─── Work board fixture (format mirrors real-world files) ─────
+const WORK_CONTENT = `---
 tags:
-  - vs
+  - work
 ---
 - [ ] Legal case - regulator inquiry - track
 - [ ] Legal case - letter to lawyers - see research notes
@@ -27,7 +27,7 @@ tags:
  - [ ] Privacy and other docs - monitor task - to plan
 
 - [ ] https://example.gov/ 🔺 - delayed because of paperwork
-- [ ] [Your support request 0000000000000000 has been created. A support advocate will contact you during our](https://learn.microsoft.com/partner-center/support/support-hours) [support business hours](https://learn.microsoft.com/partner-center/support/support-hours) at the **email address you provided** in your request. - virtoway.com tenant
+- [ ] [Your support request 0000000000000000 has been created. A support advocate will contact you during our](https://learn.microsoft.com/partner-center/support/support-hours) [support business hours](https://learn.microsoft.com/partner-center/support/support-hours) at the **email address you provided** in your request. - example.com tenant
 - [ ] Alerts - assessment tool - check if its's suitable for alerts
 - [ ] Calendar Time Zones visualisation - like Outlook
 - [ ] Calendar Zoom + Google
@@ -59,10 +59,9 @@ Your request REF EXAMPLE000000 has been pre-recorded and a VALIDATION Email tran
 
 https://eportal.nspa.example.org/vendorregistration/private/registration - in progress ![[Screenshot 2025-09-25 at 11.27.15.png]]`;
 
-// ─── Real content from Private file ──────────────────────────
+// ─── Personal board fixture ──────────────────────────────────
 const PRIVATE_CONTENT = `---
 tags:
-  - bank
   - car
   - contacts
   - finance/expense
@@ -84,16 +83,16 @@ https://app.example-swap.com/order-details?id=EXAMPLE0000000000000000
 - [ ] Investment - see details and talk to partners
 - [ ] Забрать документы в офисе - среда? `;
 
-// ─── Real content from Cervantes file (duplicate frontmatter) ─
-const CERVANTES_CONTENT = `---
+// ─── Renovation board fixture (duplicate frontmatter) ────────
+const RENOVATION_CONTENT = `---
 type: general
-tags: property/cervantes
+tags: property/renovation
 ---
 
 ---
 tags:
   - property
-  - property/cervantes
+  - property/renovation
   - spain
 
 - [ ] Вода - труба для дренажа
@@ -112,8 +111,8 @@ tags:
 
 `;
 
-// ─── Real content from VP file ───────────────────────────────
-const VP_CONTENT = `
+// ─── Minimal board fixture (no frontmatter) ───────────────────
+const MINIMAL_CONTENT = `
 - [ ] Analysis https://sandbox.example.dev/preview/`;
 
 // ═══════════════════════════════════════════════════════════════
@@ -121,8 +120,8 @@ const VP_CONTENT = `
 // ═══════════════════════════════════════════════════════════════
 
 describe('parseMarkdownTasks', () => {
-  describe('VirtoSoftware file', () => {
-    const tasks = parseMarkdownTasks(VS_CONTENT);
+  describe('Work file', () => {
+    const tasks = parseMarkdownTasks(WORK_CONTENT);
 
     it('parses all tasks (skipping frontmatter, headings, paragraphs)', () => {
       expect(tasks.length).toBe(26);
@@ -149,9 +148,9 @@ describe('parseMarkdownTasks', () => {
     });
 
     it('extracts urgent priority from 🔺 emoji', () => {
-      const samTask = tasks.find((t) => t.title.includes('example.gov'));
-      expect(samTask).toBeDefined();
-      expect(samTask!.priority).toBe('urgent');
+      const govTask = tasks.find((t) => t.title.includes('example.gov'));
+      expect(govTask).toBeDefined();
+      expect(govTask!.priority).toBe('urgent');
     });
 
     it('extracts high priority from ⏫ emoji', () => {
@@ -175,9 +174,9 @@ describe('parseMarkdownTasks', () => {
     });
 
     it('extracts bare URLs', () => {
-      const samTask = tasks.find((t) => t.title.includes('example.gov'));
-      expect(samTask).toBeDefined();
-      expect(samTask!.urls).toContain('https://example.gov/');
+      const govTask = tasks.find((t) => t.title.includes('example.gov'));
+      expect(govTask).toBeDefined();
+      expect(govTask!.urls).toContain('https://example.gov/');
     });
 
     it('extracts sharepoint link from Lost Deals task', () => {
@@ -231,7 +230,7 @@ describe('parseMarkdownTasks', () => {
       expect(tasks[0].urls[0]).toContain('ebay.es');
     });
 
-    it('skips bare URL line (example-swap) before tasks', () => {
+    it('skips bare URL line before tasks', () => {
       const titles = tasks.map((t) => t.title);
       expect(titles.some((t) => t.includes('example-swap'))).toBe(false);
     });
@@ -242,27 +241,27 @@ describe('parseMarkdownTasks', () => {
     });
 
     it('detects urgent priority in Court case', () => {
-      const vcTask = tasks.find((t) => t.title.includes('Court case'));
-      expect(vcTask).toBeDefined();
-      expect(vcTask!.priority).toBe('urgent');
+      const courtTask = tasks.find((t) => t.title.includes('Court case'));
+      expect(courtTask).toBeDefined();
+      expect(courtTask!.priority).toBe('urgent');
     });
 
     it('detects urgent priority when emoji is adjacent to text (no space)', () => {
       // "Shares to answer??? Check email🔺"
-      const singvest = tasks.find((t) => t.title.includes('Shares to answer'));
-      expect(singvest).toBeDefined();
-      expect(singvest!.priority).toBe('urgent');
+      const sharesTask = tasks.find((t) => t.title.includes('Shares to answer'));
+      expect(sharesTask).toBeDefined();
+      expect(sharesTask!.priority).toBe('urgent');
     });
 
     it('handles mixed language tasks', () => {
-      const olegTask = tasks.find((t) => t.title.includes('Contractor'));
-      expect(olegTask).toBeDefined();
-      expect(olegTask!.title).toContain('расчет');
+      const contractorTask = tasks.find((t) => t.title.includes('Contractor'));
+      expect(contractorTask).toBeDefined();
+      expect(contractorTask!.title).toContain('расчет');
     });
   });
 
-  describe('Cervantes file (duplicate frontmatter)', () => {
-    const tasks = parseMarkdownTasks(CERVANTES_CONTENT);
+  describe('Renovation file (duplicate frontmatter)', () => {
+    const tasks = parseMarkdownTasks(RENOVATION_CONTENT);
 
     it('parses all 9 tasks despite duplicate frontmatter blocks', () => {
       expect(tasks.length).toBe(9);
@@ -296,8 +295,8 @@ describe('parseMarkdownTasks', () => {
     });
   });
 
-  describe('VP file (no frontmatter, minimal)', () => {
-    const tasks = parseMarkdownTasks(VP_CONTENT);
+  describe('minimal file (no frontmatter)', () => {
+    const tasks = parseMarkdownTasks(MINIMAL_CONTENT);
 
     it('parses single task', () => {
       expect(tasks.length).toBe(1);
